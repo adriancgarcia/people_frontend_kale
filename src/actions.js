@@ -16,6 +16,7 @@ export const createAction = async ({request}) => {
     await fetch(`${baseUrl}/people`, {
         // tell fetch to make a post request
         method: 'POST',
+        credentials: 'include',
         headers: {
             // tells our backend the data is JSON
             "Content-Type": "application/json"
@@ -25,7 +26,7 @@ export const createAction = async ({request}) => {
     })
 
     // redirect the user back to the frontend index route
-    return redirect('/')
+    return redirect('/dashboard')
 }
 
 export const updateAction = async ({request, params}) => {
@@ -43,7 +44,8 @@ export const updateAction = async ({request, params}) => {
     await fetch(`${baseUrl}/people/${id}`, {
         // tell fetch to make a put request
         method: 'PUT',
-        // teel backend the data is JSON
+        credentials: 'include',
+        // tell backend the data is JSON
         headers: {
             "Content-Type": "application/json"
         },
@@ -59,10 +61,74 @@ export const deleteAction = async ({params}) => {
     const id = params.id
     // send a delete request to our backend API
     await fetch(`${baseUrl}/people/${id}`, {
+        credentials: 'include',
         // tell fetch to make a delete request
         method: 'DELETE'
         // no headers or body required for delete requests
     })
     // redirect back to the frontend index route
-    return redirect('/')
+    return redirect('/dashboard')
+}
+
+export const signupAction = async ({request}) => {
+    // get the form data
+    const formData = await request.formData()
+    // build out the new user
+    const newUser = {
+        username: formData.get('username'),
+        password: formData.get('password')
+    }
+    // send the new user to our backend API
+    const response = await fetch(`${baseUrl}/signup`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(newUser)
+    })
+
+    // check if status is 400 or more
+    if (response.status >= 400) {
+        // alert the details of error
+        alert(response.statusText)
+        // redirect back to the frontend signup route
+        return redirect('/signup')
+    }
+
+    // redirect back to the frontend login route
+    return redirect('/login')
+}
+
+export const loginAction = async ({ request }) => {
+// get the form data 
+const formData = await request.formData()
+// build out the user
+const user = {
+    username: formData.get('username'),
+    password: formData.get('password')
+}
+// send the user to our backend api
+const response = await fetch(`${baseUrl}/login`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(user)
+})
+
+// check if status is 400 or more
+if (response.status >= 400) {
+    // alert the details of error
+    alert(response.statusText)
+    // redirect back to the frontend login route
+    return redirect('/login')
+}
+
+// store wether loggedIn in localStorage
+localStorage.setItem('loggedIn', JSON.stringify({status: true}))
+
+// return redirect('/')
+// redirect back to the frontend index route
+return redirect('/dashboard')
 }
