@@ -67,7 +67,7 @@ export const deleteAction = async ({params}) => {
         // no headers or body required for delete requests
     })
     // redirect back to the frontend index route
-    return redirect('/dashboard')
+    return redirect('/')
 }
 
 export const signupAction = async ({request}) => {
